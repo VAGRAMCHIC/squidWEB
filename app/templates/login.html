@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <form class="flex flex-col gap-2 w-full max-w-xs" method="POST" action="/account/login">
+    <input class="bg-gray-400 w-full py-2 px-4 text-gray-900 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" type="text" name="username" placeholder="Имя пользователя" required>
+    <input class="bg-gray-400 w-full py-2 px-4 text-gray-900 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" type="text" name="email" placeholder="Email" required>
+    <input class="bg-gray-400 w-full py-2 px-4 text-gray-900 leading-tight focus:outline-none focus:bg-white focus:border-purple-500" type="password" name="password" placeholder="Пароль" required>
+    <button class="bg-indigo-500 hover:bg-indigo-600 justify-center px-4 py-2" type="submit">Войти</button>
+  </form>
+{% endblock %}

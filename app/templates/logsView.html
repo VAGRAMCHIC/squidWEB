@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block nav_extend %}
+
+<button class="bg-indigo-500 hover:bg-indigo-600 justify-center px-4 py-2 mx-2">
+  <a href="/">Home</a>
+</button>
+  {% if username %}
+    <label class="">{{ username }}</label>
+    <button class="bg-indigo-500 hover:bg-indigo-600 justify-center px-4 py-2 mx-2">
+      <a href="/account/logout"> Logout </a>
+    </button>
+  {% endif %}
+{% endblock %}
+
+
+{% block main %}
+  <div class="mx-21 pt-12 w-full h-full overflow-y-auto">
+    <form class="flex flex-col" method="POST" action="/manage/logs">
+        <div class="bg-indigo-500 items-center justify-between w-full flex shadow-lg p-2 mb-5 sticky" style="top: 5px">
+            <input class="font-bold w-full py-4 pl-4 text-white bg-slate-800 leading-tight focus:outline-none focus:shadow-outline lg:text-sm text-xs" type="text" placeholder="Search" name="s_pattern">
+                <button class="bg-slate-800 p-3 hover:bg-blue-400 cursor-pointer mx-2" type="submit">
+                    <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+        </div>
+    </form>
+            
+    <table class="w-full">
+      <thead class="bg-slate-800">
+            <tr>
+                <th class="border-1 border-indigo-500">Date/Time</th>
+                <th class="border-1 border-indigo-500">Client</th>
+                <th class="border-1 border-indigo-500">Status</th>
+                <th class="border-1 border-indigo-500">Method</th>
+                <th class="border-1 border-indigo-500">URL</th>
+                <th class="border-1 border-indigo-500">Size</th>
+                <th class="border-1 border-indigo-500">Content type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+                {% if 'error' in log %}
+                    <tr>
+                        <td colspan="7" style="color: red;">{{ log.error }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>{{ log.datetime }}</td>
+                        <td>{{ log.client_ip }}</td>
+                        <td class="status-{{ log.http_status // 100 }}xx">
+                            {{ log.cache_status }}/{{ log.http_status }}
+                        </td>
+                        <td>{{ log.method }}</td>
+                        <td>
+                            <a href="{{ log.url }}" target="_blank" title="{{ log.url }}">
+                                {{ log.url|truncate(40) }}
+                            </a>
+                        </td>
+                        <td>{{ log.bytes|filesizeformat }}</td>
+                        <td>{{ log.content_type }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="7">Нет данных в логах</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -172,3 +172,13 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# custom
+
+test_log/
+app/app.db
+
+
+
+
