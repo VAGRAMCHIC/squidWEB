@@ -1,5 +1,7 @@
 import os, re, subprocess
+import bcrypt
 from datetime import datetime
+
 
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask import session
@@ -26,12 +28,13 @@ LOG_PATTERN = re.compile(
 )
 
 
-def grep_search(filename, pattern):
+def grep_search(filename, pattern, index):
     result = subprocess.run(
         ['grep', pattern, filename],
         stdout=subprocess.PIPE,
         text=True
-    )
+    ).stdout.striplines()
+    res = result[:]
     return result.stdout.splitlines()
 
 def parse_squid_log(line):
@@ -97,27 +100,28 @@ def search_logs():
     try:
         pattern = request.form["s_pattern"]
         lines = grep_search(log_path, pattern)
-        for line in lines:
-            parsed = parse_squid_log(line)
-            logs.append(parsed)
-        logs.reverse()  # Новые записи в начале
-        n=100
-        final = [logs[i * n:(i + 1) * n] for i in range((len(logs) + n - 1) // n )] 
-        print (final)
-
-        total=0
-        for el in final:
-            s=list(set(el))
-            total+=len(el)-len(s)
-
-            print(total)
     except Exception as e:
         print(e)
         logs = [{'error': f'Ошибка чтения файла: {str(e)}'}]
+        return render_template('logsView.html', logs=logs, username=username)
     
+        
     return render_template('logsView.html', logs=logs, username=username)
 
 
 
+@man_bp.route('/logs/<log_path>',methods=['GET','POST'])
+@login_required
+def show_found_logs(log_path):
+    if isinstance(current_user, AnonymousUserMixin):
+        username=""
+        return redirect("account.login")
+    else:
+        username=current_user.username
+    
+    log_path = log_path
+    logs=[]
+    return log_path
 
+    
 
