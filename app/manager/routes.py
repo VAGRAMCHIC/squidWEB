@@ -12,6 +12,7 @@ from flask_login.mixins import AnonymousUserMixin
 
 from app.models import Users
 from app.database import db
+from app.utils import helpers
 
 man_bp = Blueprint('manager', __name__, url_prefix='/manage')
 
@@ -61,12 +62,7 @@ def parse_squid_log(line):
 @man_bp.route('/logs',methods=['GET'])
 @login_required
 def get_logs():
-    if isinstance(current_user, AnonymousUserMixin):
-        username=""
-        return redirect("account.login")
-    else:
-        username=current_user.username
-    
+    username = helpers.get_username()
     log_path = "test_log/access.log"
     logs = []
 

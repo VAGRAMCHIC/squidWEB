@@ -1,7 +1,7 @@
 import os
 import bcrypt
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from flask import session
 
 
@@ -21,6 +21,12 @@ login_manager = LoginManager()
 def load_user(user_id):
     return Users.query.get(int(user_id))
 
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    return redirect('/account/login?next=' + request.path)
+
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
@@ -30,7 +36,7 @@ def home(endpoint="home"):
     print(current_user)
     if isinstance(current_user, AnonymousUserMixin):
         username=""
-        return redirect("account.login")
+        return redirect(url_for("account.login"))
     else:
         username=current_user.username
         return render_template("base.html", username=username)
