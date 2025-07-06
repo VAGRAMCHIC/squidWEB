@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: squid-clickhouse
+    ports:
+      - "8123:8123"  # HTTP интерфейс
+      - "9000:9000"  # Native протокол
+    volumes:
+      - ./config/clickhouse_data:/var/lib/clickhouse
+      - ./config/clickhouse_config:/etc/clickhouse-server
+      - ./config/clickhouse_users.xml:/etc/clickhouse-server/users.d/users.xml
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - squid-net
+
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.9.0
+    volumes:
+      - ./config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./test_log:/var/log/squid:ro
+    environment:
+      LS_JAVA_OPTS: "-Xmx1g -Xms1g"
+    networks:
+      - squid-net
+    depends_on:
+      - clickhouse
+  
+  
+
+networks:
+  squid-net:
+    driver: bridge
